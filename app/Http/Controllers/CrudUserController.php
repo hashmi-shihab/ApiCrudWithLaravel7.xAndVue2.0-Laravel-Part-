@@ -21,11 +21,28 @@ class CrudUserController extends Controller
 
     public function store(Request $request)
     {
+        $rules = [
+            'username' => 'required',
+            'email' => 'required|email|unique:crud_users',
+            'mobile' => 'required'
+        ];
+
+        $customMessages = [
+            'username.required'=>'Username is required',
+            'email.required'=>'Email is required',
+            'mobile.required'=>'Mobile no is required'
+        ];
+        $this->validate($request, $rules, $customMessages);
+
+//        $requestData = $request->all();
+
         CrudUser::create([
             'username' => $request->username,
             'email' => $request->email,
             'mobile' => $request->mobile,
         ]);
+
+        return response::json(['message'=> 'User added successfully']);
     }
 
     public function show($id)
@@ -41,12 +58,27 @@ class CrudUserController extends Controller
 
     public function update(Request $request,$id)
     {
+        $rules = [
+            'username' => 'required',
+            'email' => 'required|email|unique:crud_users,email,' . $id,
+            'mobile' => 'required'
+        ];
+
+        $customMessages = [
+            'username.required'=>'Username is required',
+            'email.required'=>'Email is required',
+            'mobile.required'=>'Mobile no is required'
+        ];
+        $this->validate($request, $rules, $customMessages);
+
         $data = CrudUser::find($id);
 
         $data->username = $request->username;
         $data->email = $request->email;
         $data->mobile = $request->mobile;
         $data->save();
+
+        return response::json(['message'=> 'User\'s data has been updated successfully']);
     }
 
 
@@ -54,6 +86,8 @@ class CrudUserController extends Controller
     {
         $data = CrudUser::find($id);
         $data->delete();
+
+        return response::json(['message'=> 'User has been deleted successfully']);
 
     }
 }
